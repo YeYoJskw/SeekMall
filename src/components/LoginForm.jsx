@@ -28,24 +28,37 @@ const LoginForm = () => {
     setIsSubmitting(true);
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/auth/login`,
+        `${import.meta.env.VITE_API_URL}/login`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData),
+          credentials: 'include'
         }
       );
 
-      const data = await res.json();
+      const text = await res.text(); // сначала читаем как текст
 
-      if (res.ok) {
-        setMessage('Login successful!');
-        setMessageType('success');
-        setFormData({ email: '', password: '' });
-        // You can add redirect or update auth state here
+      if (text) {
+        const data = JSON.parse(text); // безопасно парсим
+        if (res.ok) {
+          setMessage('Login successful!');
+          setMessageType('success');
+          setFormData({ email: '', password: '' });
+        } else {
+          setMessage(data.detail || data.message || 'Login error');
+          setMessageType('error');
+        }
       } else {
-        setMessage(data.detail || data.message || 'Login error');
-        setMessageType('error');
+        // Тело пустое, но статус 200
+        if (res.ok) {
+          setMessage('Login successful!');
+          setMessageType('success');
+          setFormData({ email: '', password: '' });
+        } else {
+          setMessage('Login failed with empty response');
+          setMessageType('error');
+        }
       }
     } catch (err) {
       setMessage('Network error');
