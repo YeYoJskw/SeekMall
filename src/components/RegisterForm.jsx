@@ -34,28 +34,36 @@ const RegisterForm = () => {
 
     setIsSubmitting(true);
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/auth/register`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: formData.email,
-            password: formData.password,
-          }),
-        }
-      );
-
-      const data = await res.json();
-      if (res.ok) {
-        setMessage({ text: 'Registration successful!', type: 'success' });
-        setFormData({ email: '', password: '', confirmPassword: '' });
-      } else {
-        setMessage({
-          text: data.detail || data.message || 'Registration error',
-          type: 'error',
-        });
+          const res = await fetch(
+      `${import.meta.env.VITE_API_URL}/register`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+        credentials: 'include' // если хочешь куки — обязательно добавь
       }
+    );
+
+    let data = null;
+    try {
+      const text = await res.text(); // сначала читаем как текст
+      data = text ? JSON.parse(text) : null; // парсим, если не пустой
+    } catch (err) {
+      console.warn('Failed to parse JSON:', err);
+    }
+
+    if (res.ok) {
+      setMessage({ text: 'Registration successful!', type: 'success' });
+      setFormData({ email: '', password: '', confirmPassword: '' });
+    } else {
+      setMessage({
+        text: (data?.detail || data?.message || 'Registration error'),
+        type: 'error',
+      });
+    }
     } catch (err) {
       setMessage({
         text: 'Network error. Please check your connection.',

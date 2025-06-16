@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import RegisterForm from './RegisterForm';
 import LoginForm from './LoginForm';
 import { AnimatePresence, motion } from 'framer-motion';
+import EmailDisplay from './EmailDisplay';
 
 const Header = () => {
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
@@ -60,6 +61,9 @@ const Header = () => {
                 >
                   Login
                 </button>
+              </li>
+              <li>
+                <EmailDisplay></EmailDisplay>
               </li>
             </ul>
           </nav>
